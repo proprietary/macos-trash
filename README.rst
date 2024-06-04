@@ -22,7 +22,11 @@ Usage
    echo "hello world" > hello-world.txt
    trash hello-world.txt
 
-Currently, this command line tool cannot restore files. You will have to open Trash in Finder and restore it from the GUI. I suggest using `trash` instead of `rm`.
+This works on directories or regular files. I suggest using
+``trash`` anywhere you would have used ``rm(1)``.
+
+Currently, this command line tool cannot restore files. You will have
+to open Trash in Finder and restore it from the GUI.
 
 Building manually
 -------------------
