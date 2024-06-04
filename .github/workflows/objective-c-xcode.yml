@@ -1,0 +1,60 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    name: Build and release
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        arch: [amd64, aarch64]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build (amd64)
+        if: matrix.arch == 'amd64'
+        run: make BUILD_ARCH=x86_64
+
+      - name: Build (aarch64)
+        if: matrix.arch == 'aarch64'
+        run: make BUILD_ARCH=arm64
+
+      - name: Create Release
+        if: matrix.arch == 'amd64'
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset (amd64)
+        if: matrix.arch == 'amd64'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./trash
+          asset_name: trash-amd64
+          asset_content_type: application/octet-stream
+
+      - name: Upload Release Asset (aarch64)
+        if: matrix.arch == 'aarch64'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./trash
+          asset_name: trash-aarch64
+          asset_content_type: application/octet-stream
